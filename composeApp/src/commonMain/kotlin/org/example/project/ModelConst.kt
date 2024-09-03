@@ -21,9 +21,9 @@ const val SHOOTING_INTERVAL_MS = 50L
 data class ModelData(val ammoLeft: UInt, val activeStates: List<HeroState>)
 
 sealed interface ModelEffect {
-    object AmmoDecremented : ModelEffect
-    class StateEntered(val state: HeroState) : ModelEffect
-    class ControlEventSent(val event: ControlEvent) : ModelEffect
+    data object AmmoDecremented : ModelEffect
+    data class StateEntered(val state: HeroState) : ModelEffect
+    data class ControlEventSent(val event: ControlEvent) : ModelEffect
 }
 //// Define your States as classes or objects
 //sealed class StickManStates : DefaultState() {

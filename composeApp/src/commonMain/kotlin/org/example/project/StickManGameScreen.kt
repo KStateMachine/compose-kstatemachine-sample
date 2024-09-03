@@ -150,7 +150,7 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
         }
 
 
-        onTransitionComplete { transitionParams, activeStates ->
+        onTransitionComplete { activeStates, transitionParams ->
 //            Log.d("StickManGameScreenModel", buildString {
 //                appendLine("Transition Complete")
 //                appendLine("Event: ${transitionParams.toString()}")
@@ -280,7 +280,7 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
                 modifier = Modifier.align(Alignment.Start)
             )
             val imageRes = when {
-                uiState.activeStates.contains(Standing) -> Res.drawable.standing
+//                uiState.activeStates.contains(Standing) -> Res.drawable.standing
                 uiState.activeStates.contains(Ducking) -> Res.drawable.ducking
                 uiState.activeStates.contains(Jumping) -> Res.drawable.jumping
                 uiState.activeStates.contains(Shooting()) -> Res.drawable.standing_shooting
