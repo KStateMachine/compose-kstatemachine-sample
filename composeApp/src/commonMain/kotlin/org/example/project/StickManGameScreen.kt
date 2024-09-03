@@ -89,7 +89,6 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
                 "${this@StickManGameScreenModel::class.simpleName}: ${it()}"
             }
         }
-        val airAttacking = addState(AirAttacking())
 
         state("Fire") {
             val shooting = addState(Shooting())
@@ -125,6 +124,7 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
 
         state("Movement") {
 
+            val airAttacking = addState(AirAttacking())
             addInitialState(Standing) {
                 transition<JumpPressEvent>("Jump", targetState = Jumping)
                 transition<DuckPressEvent>("Duck", targetState = Ducking)
