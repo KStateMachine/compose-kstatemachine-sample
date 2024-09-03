@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 //import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -44,15 +45,20 @@ import com.stickman.MviModelHost
 import com.stickman.OutOfAmmoEvent
 import com.stickman.SHOOTING_INTERVAL_MS
 import com.stickman.MviModel.*
+import com.stickman.hasState
+import com.stickman.observe
 //import io.kamel.core.Resource
 //import io.kamel.image.asyncPainterResource
 //import io.kamel.image.lazyPainterResource
 import kotlinx.coroutines.flow.collectLatest
 import kstatemachine_compose_sample.composeapp.generated.resources.Res
 import kstatemachine_compose_sample.composeapp.generated.resources.airattacking
+import kstatemachine_compose_sample.composeapp.generated.resources.airattacking_shooting
 import kstatemachine_compose_sample.composeapp.generated.resources.compose_multiplatform
 import kstatemachine_compose_sample.composeapp.generated.resources.ducking
+import kstatemachine_compose_sample.composeapp.generated.resources.ducking_shooting
 import kstatemachine_compose_sample.composeapp.generated.resources.jumping
+import kstatemachine_compose_sample.composeapp.generated.resources.jumping_shooting
 import kstatemachine_compose_sample.composeapp.generated.resources.standing
 import kstatemachine_compose_sample.composeapp.generated.resources.standing_shooting
 import kstatemachine_compose_sample.composeapp.generated.resources.stickman
@@ -78,7 +84,11 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
     override val model = MviModel<ModelData, ModelEffect>(screenModelScope, ModelData(INITIAL_AMMO, listOf(Standing)))
 
     private val machine = createStateMachineBlocking(screenModelScope, "Hero", ChildMode.PARALLEL,creationArguments = StateMachine.CreationArguments(doNotThrowOnMultipleTransitionsMatch=true)) {
-//        logger = StateMachine.Logger { Log.d(this@StickManGameScreenModel::class.simpleName, it()) }
+        logger = StateMachine.Logger {
+            Logger.i {
+                "${this@StickManGameScreenModel::class.simpleName}: ${it()}"
+            }
+        }
         val airAttacking = addState(AirAttacking())
 
         state("Fire") {
@@ -151,13 +161,15 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
 
 
         onTransitionComplete { activeStates, transitionParams ->
-//            Log.d("StickManGameScreenModel", buildString {
-//                appendLine("Transition Complete")
-//                appendLine("Event: ${transitionParams.toString()}")
-////                appendLine("From State: ${transitionParams.transition().name}")
-////                appendLine("To State: ${transitionParams.stream()}")
-//                appendLine("Active States: ${activeStates().joinToString { it.name.toString() }}")
-//            })
+            Logger.i {
+                buildString {
+                    appendLine("Transition Complete")
+                    appendLine("Event: ${transitionParams.toString()}")
+//                    appendLine("From State: ${transitionParams.transition().name}")
+//                    appendLine("To State: ${transitionParams.stream()}")
+                    appendLine("Active States: ${activeStates().joinToString { it.name.toString() }}")
+                }
+            }
             intent {
                 val filteredStates = (activeStates as? Iterable<*>)?.filterIsInstance<HeroState>()
                 if (filteredStates != null) {
@@ -166,12 +178,14 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
             }
         }
         onStateEntry { state, transitionParams  ->
-//            Log.d("StickManGameScreenModel", """
-//            Entering State: ${state.name}
-//            Previous State: ${transitionParams.transition.name}
-//            Event Triggered: ${transitionParams.event}
-//            Active States: ${this.activeStates().map { it.name }}
-//            """.trimIndent())
+            Logger.i {
+                            """
+                Entering State: ${state.name}
+                Previous State: ${transitionParams.transition.name}
+                Event Triggered: ${transitionParams.event}
+                Active States: ${this.activeStates().map { it.name }}
+                """.trimIndent()
+            }
             intent {
                 if (state is HeroState)
                     sendEffect(ModelEffect.StateEntered(state))
@@ -202,7 +216,37 @@ class StickManGameScreen : Screen {
         StickManGameScreenContent(viewModel)
     }
 }
+private fun onStateChanged(
+    state: ModelData,
+    onDrawableChange: (org.jetbrains.compose.resources.DrawableResource) -> Unit,  // Update to use DrawableResource
+    onAmmoChange: (Int) -> Unit
+) {
+    state.activeStates.let {
+        val drawableRes = when {
+            it.hasState<Shooting>() && it.hasState<Standing>() -> Res.drawable.standing_shooting
+            it.hasState<Shooting>() && it.hasState<AirAttacking>() -> Res.drawable.airattacking_shooting
+            it.hasState<Shooting>() && it.hasState<Ducking>() -> Res.drawable.ducking_shooting
+            it.hasState<Shooting>() && it.hasState<Jumping>() -> Res.drawable.jumping_shooting
+            it.hasState<Standing>() -> Res.drawable.standing
+            it.hasState<AirAttacking>() -> Res.drawable.airattacking
+            it.hasState<Ducking>() -> Res.drawable.ducking
+            it.hasState<Jumping>() -> Res.drawable.jumping
+            else -> Res.drawable.standing // Default drawable if no specific state is found
+        }
+        onDrawableChange(drawableRes)
+    }
 
+    // Update ammo count state
+    onAmmoChange(state.ammoLeft.toInt())
+}
+
+private fun onEffect(effect: ModelEffect) {
+    when (effect) {
+        ModelEffect.AmmoDecremented -> Logger.i { "*" }
+        is ModelEffect.StateEntered -> Logger.i { effect.state::class.simpleName.toString() }
+        is ModelEffect.ControlEventSent -> Logger.i { effect.event::class.simpleName.toString() }
+    }
+}
 @Composable
 fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
     val xkcdClient = remember { XkcdClient() }
@@ -212,11 +256,29 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
     val uiState by viewModel.model.stateFlow.collectAsState()
     var showContent by remember { mutableStateOf(false) }
 
+    // State variables for drawable and ammo count
+    var heroDrawableRes by remember { mutableStateOf(Res.drawable.standing) }
+    var ammoCount by remember { mutableStateOf(0) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             imageUrl = xkcdClient.getCurrentXkcdImageUrl()
+            viewModel.observe(
+                lifecycleOwner,
+                { state ->
+                    onStateChanged(
+                        state,
+                        onDrawableChange = { newDrawableRes  -> heroDrawableRes  = newDrawableRes  },
+                        onAmmoChange = { newAmmo -> ammoCount = newAmmo }
+                    )
+                },
+                ::onEffect
+            )
         }
     }
+    val heroDrawable = painterResource(heroDrawableRes)
 
     LaunchedEffect(uiState) {
         Logger.i {"State updated: $uiState"}
@@ -244,8 +306,7 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-//        verticalArrangement = Arrangement.SpaceBetween
-            verticalArrangement = Arrangement.spacedBy(16.dp), // Add spacing between items
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AnimatedVisibility(showContent) {
@@ -279,16 +340,20 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
                 fontSize = 20.sp,
                 modifier = Modifier.align(Alignment.Start)
             )
-            val imageRes = when {
-//                uiState.activeStates.contains(Standing) -> Res.drawable.standing
-                uiState.activeStates.contains(Ducking) -> Res.drawable.ducking
-                uiState.activeStates.contains(Jumping) -> Res.drawable.jumping
-                uiState.activeStates.contains(Shooting()) -> Res.drawable.standing_shooting
-                uiState.activeStates.contains(AirAttacking()) -> Res.drawable.airattacking
-                else -> Res.drawable.standing
-            }
-            Image(painterResource(imageRes), null)
-
+//            val imageRes = when {
+////                uiState.activeStates.contains(Standing) -> Res.drawable.standing
+//                uiState.activeStates.contains(Ducking) -> Res.drawable.ducking
+//                uiState.activeStates.contains(Jumping) -> Res.drawable.jumping
+//                uiState.activeStates.contains(Shooting()) -> Res.drawable.standing_shooting
+//                uiState.activeStates.contains(AirAttacking()) -> Res.drawable.airattacking
+//                else -> Res.drawable.standing
+//            }
+//            Image(painterResource(imageRes), null)
+            Image(
+                painter = heroDrawable, // Use Painter type here
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth()
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -29,3 +29,7 @@ sealed class HeroState : DefaultState() {
         lateinit var shootingTimer: Job
     }
 }
+
+public inline fun <reified S : HeroState> List<HeroState>.hasState(): Boolean {
+    return this.filterIsInstance<S>().isNotEmpty()
+}
