@@ -77,7 +77,7 @@ import ru.nsk.kstatemachine.transition.onTriggered
 class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect> {
     override val model = MviModel<ModelData, ModelEffect>(screenModelScope, ModelData(INITIAL_AMMO, listOf(Standing)))
 
-    private val machine = createStateMachineBlocking(screenModelScope, "Hero", ChildMode.PARALLEL) {
+    private val machine = createStateMachineBlocking(screenModelScope, "Hero", ChildMode.PARALLEL,creationArguments = StateMachine.CreationArguments(doNotThrowOnMultipleTransitionsMatch=true)) {
 //        logger = StateMachine.Logger { Log.d(this@StickManGameScreenModel::class.simpleName, it()) }
         val airAttacking = addState(AirAttacking())
 
