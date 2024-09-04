@@ -1,5 +1,4 @@
-import com.sample.kstatemachine_compose_sample.StickManGameScreenModel
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.example.project.StickManGameScreenModel
 import org.koin.dsl.module
 
 val koinModule = module {

@@ -3,6 +3,9 @@ package com.sample.kstatemachine_compose_sample
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
@@ -14,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 //import androidx.compose.ui.res.painterResource
@@ -61,153 +65,11 @@ import kstatemachine_compose_sample.composeapp.generated.resources.jumping
 import kstatemachine_compose_sample.composeapp.generated.resources.jumping_shooting
 import kstatemachine_compose_sample.composeapp.generated.resources.standing
 import kstatemachine_compose_sample.composeapp.generated.resources.standing_shooting
-import kstatemachine_compose_sample.composeapp.generated.resources.stickman
 import org.example.project.Greeting
+import org.example.project.StickManGameScreenModel
 import org.example.project.XkcdClient
 import org.jetbrains.compose.resources.painterResource
-import ru.nsk.kstatemachine.state.ChildMode
-import ru.nsk.kstatemachine.state.activeStates
-import ru.nsk.kstatemachine.state.addInitialState
-import ru.nsk.kstatemachine.state.invoke
-import ru.nsk.kstatemachine.state.onEntry
-import ru.nsk.kstatemachine.state.onExit
-import ru.nsk.kstatemachine.state.state
-import ru.nsk.kstatemachine.state.transition
-import ru.nsk.kstatemachine.state.transitionOn
-import ru.nsk.kstatemachine.statemachine.StateMachine
-import ru.nsk.kstatemachine.statemachine.createStateMachineBlocking
-import ru.nsk.kstatemachine.statemachine.onStateEntry
-import ru.nsk.kstatemachine.statemachine.onTransitionComplete
-import ru.nsk.kstatemachine.transition.onTriggered
 
-class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect> {
-    override val model = MviModel<ModelData, ModelEffect>(screenModelScope, ModelData(INITIAL_AMMO, listOf(Standing)))
-
-    private val machine = createStateMachineBlocking(screenModelScope, "Hero", ChildMode.PARALLEL,creationArguments = StateMachine.CreationArguments(doNotThrowOnMultipleTransitionsMatch=true)) {
-        logger = StateMachine.Logger {
-            Logger.i {
-                "${this@StickManGameScreenModel::class.simpleName}: ${it()}"
-            }
-        }
-
-        state("Fire") {
-            val shooting = addState(Shooting())
-
-
-            addInitialState(NotShooting) {
-                transition<FirePressEvent> {
-                    guard = { state.ammoLeft > 0u }
-                    targetState = shooting
-                }
-            }
-            shooting {
-                transition<FireReleaseEvent>(targetState = NotShooting)
-                transition<OutOfAmmoEvent>(targetState = NotShooting)
-
-                onEntry {
-                    shootingTimer = screenModelScope.launch {
-                        tickerFlow(SHOOTING_INTERVAL_MS).collect {
-                            if (state.ammoLeft == 0u)
-                                sendEvent(OutOfAmmoEvent)
-                            else
-                                decrementAmmo()
-                        }
-                    }
-                }
-                onExit { shootingTimer.cancel() }
-            }
-
-
-
-
-        }
-
-        state("Movement") {
-
-            val airAttacking = addState(AirAttacking())
-            addInitialState(Standing) {
-                transition<JumpPressEvent>("Jump", targetState = Jumping)
-                transition<DuckPressEvent>("Duck", targetState = Ducking)
-            }
-
-            addState(Jumping) {
-                onEntry {
-                    screenModelScope.singleShotTimer(JUMP_DURATION_MS) {
-                        sendEvent(JumpCompleteEvent)
-                    }
-                }
-                transition<DuckPressEvent>("AirAttack", targetState = airAttacking)
-                transition<JumpCompleteEvent>("Land after jump", targetState = Standing)
-            }
-
-            addState(Ducking) {
-                transition<DuckReleaseEvent>("StandUp", targetState = Standing)
-            }
-
-            airAttacking  {
-                onEntry { isDuckPressed = true }
-
-                transitionOn<JumpCompleteEvent>("Land after attack") {
-                    targetState = { if (this@airAttacking.isDuckPressed) Ducking else Standing }
-                }
-                transition<DuckPressEvent>("Duck pressed") {
-                    onTriggered { this@airAttacking.isDuckPressed = true }
-                }
-                transition<DuckReleaseEvent>("Duck released") {
-                    onTriggered { this@airAttacking.isDuckPressed = false }
-                }
-            }
-        }
-
-
-        onTransitionComplete { activeStates, transitionParams ->
-            Logger.i {
-                buildString {
-                    appendLine("Transition Complete")
-                    appendLine("Event: ${transitionParams.toString()}")
-//                    appendLine("From State: ${transitionParams.transition().name}")
-//                    appendLine("To State: ${transitionParams.stream()}")
-                    appendLine("Active States: ${activeStates().joinToString { it.name.toString() }}")
-                }
-            }
-            intent {
-                val filteredStates = (activeStates as? Iterable<*>)?.filterIsInstance<HeroState>()
-                if (filteredStates != null) {
-                    state { copy(activeStates = filteredStates) }
-                }
-            }
-        }
-        onStateEntry { state, transitionParams  ->
-            Logger.i {
-                            """
-                Entering State: ${state.name}
-                Previous State: ${transitionParams.transition.name}
-                Event Triggered: ${transitionParams.event}
-                Active States: ${this.activeStates().map { it.name }}
-                """.trimIndent()
-            }
-            intent {
-                if (state is HeroState)
-                    sendEffect(ModelEffect.StateEntered(state))
-            }
-        }
-
-    }
-
-    fun sendEvent(event: ControlEvent): Unit = intent {
-        sendEffect(ModelEffect.ControlEventSent(event))
-        machine.processEvent(event)
-    }
-
-    fun reloadAmmo() = intent {
-        state { copy(ammoLeft = INITIAL_AMMO) }
-    }
-
-    private fun decrementAmmo() = intent {
-        state { copy(ammoLeft = ammoLeft - 1u) }
-        sendEffect(ModelEffect.AmmoDecremented)
-    }
-}
 
 class StickManGameScreen : Screen {
     @Composable
@@ -216,6 +78,7 @@ class StickManGameScreen : Screen {
         StickManGameScreenContent(viewModel)
     }
 }
+
 private fun onStateChanged(
     state: ModelData,
     onDrawableChange: (org.jetbrains.compose.resources.DrawableResource) -> Unit,  // Update to use DrawableResource
@@ -247,6 +110,7 @@ private fun onEffect(effect: ModelEffect) {
         is ModelEffect.ControlEventSent -> Logger.i { effect.event::class.simpleName.toString() }
     }
 }
+
 @Composable
 fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
     val xkcdClient = remember { XkcdClient() }
@@ -261,6 +125,13 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
     var ammoCount by remember { mutableStateOf(0) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    val duckInteractionSource = remember { MutableInteractionSource() }
+    val isDuckPressed by duckInteractionSource.collectIsPressedAsState()
+
+    val fireInteractionSource = remember { MutableInteractionSource() }
+    val isFirePressed by fireInteractionSource.collectIsPressedAsState()
+    val heroDrawable = painterResource(heroDrawableRes)
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -278,10 +149,27 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
             )
         }
     }
-    val heroDrawable = painterResource(heroDrawableRes)
+
+    // Detect Duck Button State
+    LaunchedEffect(isDuckPressed) {
+        if (isDuckPressed) {
+            viewModel.sendEvent(DuckPressEvent)
+        } else {
+            viewModel.sendEvent(DuckReleaseEvent)
+        }
+    }
+
+    // Detect Fire Button State
+    LaunchedEffect(isFirePressed) {
+        if (isFirePressed) {
+            viewModel.sendEvent(FirePressEvent)
+        } else {
+            viewModel.sendEvent(FireReleaseEvent)
+        }
+    }
 
     LaunchedEffect(uiState) {
-        Logger.i {"State updated: $uiState"}
+        Logger.i { "State updated: $uiState" }
     }
 
     LaunchedEffect(viewModel.model.effectFlow) {
@@ -317,9 +205,9 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
                 ) {
                     imageUrl?.let { url ->
                         CoilImage(
-                            modifier = Modifier.fillMaxWidth()//.size(200.dp),
+                            modifier = Modifier.fillMaxWidth()
                             ,
-                            imageModel = { imageUrl }, // loading a network image or local resource using an URL.
+                            imageModel = { imageUrl },
                             imageOptions = ImageOptions(
                                 contentScale = ContentScale.Crop,
                                 alignment = Alignment.Center
@@ -334,37 +222,25 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
                     Text("Compose: $greeting")
                 }
             }
-            // Ammo TextView
             Text(
-                text = "Ammo: ${uiState.ammoLeft}", // Dynamically displaying the ammo count
+                text = "Ammo: ${uiState.ammoLeft}",
                 fontSize = 20.sp,
                 modifier = Modifier.align(Alignment.Start)
             )
-//            val imageRes = when {
-////                uiState.activeStates.contains(Standing) -> Res.drawable.standing
-//                uiState.activeStates.contains(Ducking) -> Res.drawable.ducking
-//                uiState.activeStates.contains(Jumping) -> Res.drawable.jumping
-//                uiState.activeStates.contains(Shooting()) -> Res.drawable.standing_shooting
-//                uiState.activeStates.contains(AirAttacking()) -> Res.drawable.airattacking
-//                else -> Res.drawable.standing
-//            }
-//            Image(painterResource(imageRes), null)
             Image(
-                painter = heroDrawable, // Use Painter type here
+                painter = heroDrawable,
                 contentDescription = null,
                 modifier = Modifier.fillMaxWidth()
             )
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(onClick = {
-                    viewModel.sendEvent(DuckPressEvent)
-                }
-                )
-                {
+                Button(
+                    onClick = {},
+                    interactionSource = duckInteractionSource,
+                ) {
                     Text(text = "Duck")
                 }
                 Button(onClick = {
@@ -372,9 +248,10 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
                 }) {
                     Text(text = "Jump")
                 }
-                Button(onClick = {
-                    viewModel.sendEvent(FirePressEvent)
-                }) {
+                Button(
+                    onClick = {},
+                    interactionSource = fireInteractionSource,
+                ) {
                     Text(text = "Fire")
                 }
                 Button(onClick = { viewModel.reloadAmmo() }) {
@@ -386,9 +263,9 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
             painter = painterResource(Res.drawable.compose_multiplatform),
             contentDescription = null,
             modifier = Modifier
-                .size(100.dp)  // Set the size of the image
-                .align(Alignment.TopEnd) // Align the image to the top-right corner
-                .padding(8.dp)  // Optional padding to avoid touching the screen edges
+                .size(100.dp)
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
                 .clickable { showContent = !showContent }
         )
     }
