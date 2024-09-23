@@ -12,3 +12,6 @@ State machine is used to define and control Hero states like in 2D shooter games
 ## How to build
 
 * Build with Intellij IDEA or run `./gradlew` script.
+
+## Thanks to
+[David Horner](https://github.com/davehorner)
