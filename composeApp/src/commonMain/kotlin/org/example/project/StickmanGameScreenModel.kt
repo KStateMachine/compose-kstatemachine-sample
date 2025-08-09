@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import ru.nsk.kstatemachine.state.ChildMode
 import ru.nsk.kstatemachine.state.activeStates
 import ru.nsk.kstatemachine.state.addInitialState
+import ru.nsk.kstatemachine.state.addState
 import ru.nsk.kstatemachine.state.invoke
 import ru.nsk.kstatemachine.state.onEntry
 import ru.nsk.kstatemachine.state.onExit
@@ -26,19 +27,27 @@ import ru.nsk.kstatemachine.state.state
 import ru.nsk.kstatemachine.state.transition
 import ru.nsk.kstatemachine.state.transitionOn
 import ru.nsk.kstatemachine.statemachine.StateMachine
+import ru.nsk.kstatemachine.statemachine.buildCreationArguments
 import ru.nsk.kstatemachine.statemachine.createStateMachineBlocking
 import ru.nsk.kstatemachine.statemachine.onStateEntry
 import ru.nsk.kstatemachine.statemachine.onTransitionComplete
 import ru.nsk.kstatemachine.transition.onTriggered
 
 class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect> {
-    override val model = MviModel<ModelData, ModelEffect>(screenModelScope, ModelData(
-        INITIAL_AMMO, listOf(
-            Standing
-        ))
+    override val model = MviModel<ModelData, ModelEffect>(
+        screenModelScope, ModelData(
+            INITIAL_AMMO, listOf(
+                Standing
+            )
+        )
     )
 
-    private val machine = createStateMachineBlocking(screenModelScope, "Hero", ChildMode.PARALLEL,creationArguments = StateMachine.CreationArguments(doNotThrowOnMultipleTransitionsMatch=true)) {
+    private val machine = createStateMachineBlocking(
+        screenModelScope,
+        "Hero",
+        ChildMode.PARALLEL,
+        creationArguments = buildCreationArguments { doNotThrowOnMultipleTransitionsMatch = true }
+    ) {
         logger = StateMachine.Logger {
             Logger.i {
                 "${this@StickManGameScreenModel::class.simpleName}: ${it()}"
@@ -67,7 +76,7 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
                 transition<DuckReleaseEvent>("StandUp", targetState = Standing)
             }
 
-            airAttacking  {
+            airAttacking {
                 onEntry { isDuckPressed = true }
 
                 transitionOn<JumpCompleteEvent>("Land after attack") {
@@ -128,8 +137,9 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
                 }
             }
         }
-        onStateEntry { state, transitionParams  ->
-            Logger.i { """
+        onStateEntry { state, transitionParams ->
+            Logger.i {
+                """
                 Entering State: ${state.name}
                 Previous State: ${transitionParams.transition.name}
                 Event Triggered: ${transitionParams.event}

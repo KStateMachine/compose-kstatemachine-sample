@@ -166,7 +166,6 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
                 Column(
                     Modifier.fillMaxWidth().weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -187,7 +186,6 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
                         null,
                         modifier = Modifier.size(100.dp)
                     )
-                    Text("Compose: $greeting")
                 }
             }
             Text(
