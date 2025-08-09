@@ -1,4 +1,4 @@
-package com.stickman
+package org.example.project
 
 import kotlinx.coroutines.Job
 import ru.nsk.kstatemachine.event.Event
@@ -30,6 +30,6 @@ sealed class HeroState : DefaultState() {
     }
 }
 
-public inline fun <reified S : HeroState> List<HeroState>.hasState(): Boolean {
+inline fun <reified S : HeroState> List<HeroState>.hasState(): Boolean {
     return this.filterIsInstance<S>().isNotEmpty()
 }

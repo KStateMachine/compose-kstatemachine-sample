@@ -1,59 +1,29 @@
-package com.sample.kstatemachine_compose_sample
+package org.example.project
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
-//import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.launch
-import ru.nsk.kstatemachine.*
-import com.stickman.ControlEvent.*
-import com.stickman.HeroState.*
-import com.stickman.ControlEvent
-import com.stickman.HeroState
-import com.stickman.INITIAL_AMMO
-import com.stickman.JUMP_DURATION_MS
-import com.stickman.singleShotTimer
-import com.stickman.tickerFlow
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import org.example.project.ControlEvent.*
+import org.example.project.HeroState.*
 import cafe.adriel.voyager.koin.getScreenModel
 import co.touchlab.kermit.Logger
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil3.CoilImage
-import com.stickman.ModelData
-import com.stickman.ModelEffect
-import com.stickman.MviModel
-import com.stickman.MviModelHost
-import com.stickman.OutOfAmmoEvent
-import com.stickman.SHOOTING_INTERVAL_MS
-import com.stickman.MviModel.*
-import com.stickman.hasState
-import com.stickman.observe
-//import io.kamel.core.Resource
-//import io.kamel.image.asyncPainterResource
-//import io.kamel.image.lazyPainterResource
 import kotlinx.coroutines.flow.collectLatest
 import kstatemachine_compose_sample.composeapp.generated.resources.Res
 import kstatemachine_compose_sample.composeapp.generated.resources.airattacking
@@ -65,9 +35,7 @@ import kstatemachine_compose_sample.composeapp.generated.resources.jumping
 import kstatemachine_compose_sample.composeapp.generated.resources.jumping_shooting
 import kstatemachine_compose_sample.composeapp.generated.resources.standing
 import kstatemachine_compose_sample.composeapp.generated.resources.standing_shooting
-import org.example.project.Greeting
-import org.example.project.StickManGameScreenModel
-import org.example.project.XkcdClient
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 
@@ -81,7 +49,7 @@ class StickManGameScreen : Screen {
 
 private fun onStateChanged(
     state: ModelData,
-    onDrawableChange: (org.jetbrains.compose.resources.DrawableResource) -> Unit,  // Update to use DrawableResource
+    onDrawableChange: (DrawableResource) -> Unit,  // Update to use DrawableResource
     onAmmoChange: (Int) -> Unit
 ) {
     state.activeStates.let {

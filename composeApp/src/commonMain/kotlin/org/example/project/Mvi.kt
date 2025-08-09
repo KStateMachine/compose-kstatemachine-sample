@@ -1,4 +1,4 @@
-package com.stickman
+package org.example.project
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner

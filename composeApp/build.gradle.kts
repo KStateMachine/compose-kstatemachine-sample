@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -14,7 +13,7 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
     
@@ -55,20 +54,11 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.serialization.kotlinx.json)
 
-//            implementation(libs.kstatemachine)
-//            implementation(libs.kstatemachine.coroutines)
             val voyagerVersion = "1.1.0-beta02"
 
             implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
-//            implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
-//            implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
-//            implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
-//            implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
-            //implementation("cafe.adriel.voyager:voyager-lifecycle-kmp:$voyagerVersion")
-//            implementation("media.kamel:kamel-image:0.9.5")
             implementation(libs.kstatemachine)
             implementation(libs.kstatemachine.coroutines)
-
 
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -94,8 +84,8 @@ android {
         applicationId = "org.example.project"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
     packaging {
         resources {
@@ -108,8 +98,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true

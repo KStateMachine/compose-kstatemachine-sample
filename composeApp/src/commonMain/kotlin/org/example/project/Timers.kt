@@ -1,4 +1,4 @@
-package com.stickman
+package org.example.project
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay

@@ -3,30 +3,18 @@ package org.example.project
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import co.touchlab.kermit.Logger
-import com.stickman.ControlEvent
-import com.stickman.ControlEvent.DuckPressEvent
-import com.stickman.ControlEvent.DuckReleaseEvent
-import com.stickman.ControlEvent.FirePressEvent
-import com.stickman.ControlEvent.FireReleaseEvent
-import com.stickman.ControlEvent.JumpCompleteEvent
-import com.stickman.ControlEvent.JumpPressEvent
-import com.stickman.HeroState
-import com.stickman.HeroState.AirAttacking
-import com.stickman.HeroState.Ducking
-import com.stickman.HeroState.Jumping
-import com.stickman.HeroState.NotShooting
-import com.stickman.HeroState.Shooting
-import com.stickman.HeroState.Standing
-import com.stickman.INITIAL_AMMO
-import com.stickman.JUMP_DURATION_MS
-import com.stickman.ModelData
-import com.stickman.ModelEffect
-import com.stickman.MviModel
-import com.stickman.MviModelHost
-import com.stickman.OutOfAmmoEvent
-import com.stickman.SHOOTING_INTERVAL_MS
-import com.stickman.singleShotTimer
-import com.stickman.tickerFlow
+import org.example.project.ControlEvent.DuckPressEvent
+import org.example.project.ControlEvent.DuckReleaseEvent
+import org.example.project.ControlEvent.FirePressEvent
+import org.example.project.ControlEvent.FireReleaseEvent
+import org.example.project.ControlEvent.JumpCompleteEvent
+import org.example.project.ControlEvent.JumpPressEvent
+import org.example.project.HeroState.AirAttacking
+import org.example.project.HeroState.Ducking
+import org.example.project.HeroState.Jumping
+import org.example.project.HeroState.NotShooting
+import org.example.project.HeroState.Shooting
+import org.example.project.HeroState.Standing
 import kotlinx.coroutines.launch
 import ru.nsk.kstatemachine.state.ChildMode
 import ru.nsk.kstatemachine.state.activeStates
@@ -120,10 +108,6 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
                 }
                 onExit { shootingTimer.cancel() }
             }
-
-
-
-
         }
 
 
