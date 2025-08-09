@@ -1,34 +1,27 @@
 package org.example.project
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.launch
 import org.example.project.ControlEvent.*
 import org.example.project.HeroState.*
 import cafe.adriel.voyager.koin.getScreenModel
 import co.touchlab.kermit.Logger
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.coil3.CoilImage
 import kotlinx.coroutines.flow.collectLatest
 import kstatemachine_compose_sample.composeapp.generated.resources.Res
 import kstatemachine_compose_sample.composeapp.generated.resources.airattacking
 import kstatemachine_compose_sample.composeapp.generated.resources.airattacking_shooting
-import kstatemachine_compose_sample.composeapp.generated.resources.compose_multiplatform
 import kstatemachine_compose_sample.composeapp.generated.resources.ducking
 import kstatemachine_compose_sample.composeapp.generated.resources.ducking_shooting
 import kstatemachine_compose_sample.composeapp.generated.resources.jumping
@@ -37,7 +30,6 @@ import kstatemachine_compose_sample.composeapp.generated.resources.standing
 import kstatemachine_compose_sample.composeapp.generated.resources.standing_shooting
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-
 
 class StickManGameScreen : Screen {
     @Composable
@@ -81,12 +73,9 @@ private fun onEffect(effect: ModelEffect) {
 
 @Composable
 fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
-    val xkcdClient = remember { XkcdClient() }
     val coroutineScope = rememberCoroutineScope()
-    var imageUrl by remember { mutableStateOf<String?>(null) }
     // Observe the state from the ViewModel
     val uiState by viewModel.model.stateFlow.collectAsState()
-    var showContent by remember { mutableStateOf(false) }
 
     // State variables for drawable and ammo count
     var heroDrawableRes by remember { mutableStateOf(Res.drawable.standing) }
@@ -103,7 +92,6 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            imageUrl = xkcdClient.getCurrentXkcdImageUrl()
             viewModel.observe(
                 lifecycleOwner,
                 { state ->
@@ -165,29 +153,6 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AnimatedVisibility(showContent) {
-                Column(
-                    Modifier.fillMaxWidth().weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    imageUrl?.let { url ->
-                        CoilImage(
-                            modifier = Modifier.fillMaxWidth()
-                            ,
-                            imageModel = { imageUrl },
-                            imageOptions = ImageOptions(
-                                contentScale = ContentScale.Crop,
-                                alignment = Alignment.Center
-                            )
-                        )
-                    } ?: CircularProgressIndicator()
-                    Image(
-                        painterResource(Res.drawable.compose_multiplatform),
-                        null,
-                        modifier = Modifier.size(100.dp)
-                    )
-                }
-            }
             Text(
                 text = "Ammo: ${uiState.ammoLeft}",
                 fontSize = 20.sp,
@@ -225,14 +190,5 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
                 }
             }
         }
-        Image(
-            painter = painterResource(Res.drawable.compose_multiplatform),
-            contentDescription = null,
-            modifier = Modifier
-                .size(100.dp)
-                .align(Alignment.TopEnd)
-                .padding(8.dp)
-                .clickable { showContent = !showContent }
-        )
     }
 }

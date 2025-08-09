@@ -4,7 +4,6 @@ import kotlinx.coroutines.Job
 import ru.nsk.kstatemachine.event.Event
 import ru.nsk.kstatemachine.state.DefaultState
 
-
 sealed interface ControlEvent : Event {
     object JumpPressEvent : ControlEvent
     object JumpCompleteEvent : ControlEvent

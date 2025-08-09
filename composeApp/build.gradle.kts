@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
-    kotlin("plugin.serialization") version "1.5.30"
 }
 
 kotlin {
@@ -45,14 +44,6 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.navigator.koin)
             implementation(libs.navigator.screen.model)
-
-            // Ktor for networking
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.cio) // or another engine
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.ktor.serialization.kotlinx.json)
 
             val voyagerVersion = "1.1.0-beta02"
 
