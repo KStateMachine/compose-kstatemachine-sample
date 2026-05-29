@@ -63,6 +63,7 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
             val msg = when (effect) {
                 is ModelEffect.StateEntered -> "State Entered: ${effect.state::class.simpleName}"
                 is ModelEffect.ControlEventSent -> "Control Event Sent: ${effect.event::class.simpleName}"
+                is ModelEffect.TransitionTriggered -> "Transition: ${effect.name ?: "<unnamed>"}"
                 ModelEffect.AmmoDecremented -> "Ammo Decremented"
             }
             logMessages.add(0, msg)
@@ -82,6 +83,11 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
         Text(
             text = "Ammo: ${uiState.ammoLeft}",
             fontSize = 20.sp,
+            modifier = Modifier.align(Alignment.Start)
+        )
+        Text(
+            text = uiState.activeStates.joinToString(" | ") { it::class.simpleName!! },
+            fontSize = 14.sp,
             modifier = Modifier.align(Alignment.Start)
         )
         Spacer(modifier = Modifier.height(16.dp))

@@ -11,20 +11,18 @@ sealed interface ControlEvent : Event {
     object DuckReleaseEvent : ControlEvent
     object FirePressEvent : ControlEvent
     object FireReleaseEvent : ControlEvent
+    object OutOfAmmoEvent : ControlEvent
 }
-object OutOfAmmoEvent : ControlEvent
 
 sealed class HeroState : DefaultState() {
     object Standing : HeroState()
     object Jumping : HeroState()
     object Ducking : HeroState()
-    class AirAttacking : HeroState()
-    {
+    class AirAttacking : HeroState() {
         var isDuckPressed: Boolean = true
     }
     object NotShooting : HeroState()
-    class Shooting : HeroState()
-    {
+    class Shooting : HeroState() {
         lateinit var shootingTimer: Job
     }
 }

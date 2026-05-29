@@ -8,6 +8,7 @@ import org.example.project.ControlEvent.FirePressEvent
 import org.example.project.ControlEvent.FireReleaseEvent
 import org.example.project.ControlEvent.JumpCompleteEvent
 import org.example.project.ControlEvent.JumpPressEvent
+import org.example.project.ControlEvent.OutOfAmmoEvent
 import org.example.project.HeroState.AirAttacking
 import org.example.project.HeroState.Ducking
 import org.example.project.HeroState.Jumping
@@ -29,6 +30,7 @@ import ru.nsk.kstatemachine.statemachine.buildCreationArguments
 import ru.nsk.kstatemachine.statemachine.createStateMachineBlocking
 import ru.nsk.kstatemachine.statemachine.onStateEntry
 import ru.nsk.kstatemachine.statemachine.onTransitionComplete
+import ru.nsk.kstatemachine.statemachine.onTransitionTriggered
 import ru.nsk.kstatemachine.transition.onTriggered
 
 class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect> {
@@ -121,6 +123,9 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
                 if (state is HeroState)
                     sendEffect(ModelEffect.StateEntered(state))
             }
+        }
+        onTransitionTriggered { transitionParams ->
+            intent { sendEffect(ModelEffect.TransitionTriggered(transitionParams.transition.name)) }
         }
     }
 

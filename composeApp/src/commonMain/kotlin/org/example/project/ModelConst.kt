@@ -10,4 +10,5 @@ sealed interface ModelEffect {
     data object AmmoDecremented : ModelEffect
     data class StateEntered(val state: HeroState) : ModelEffect
     data class ControlEventSent(val event: ControlEvent) : ModelEffect
+    data class TransitionTriggered(val name: String?) : ModelEffect
 }
