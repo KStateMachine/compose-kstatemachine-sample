@@ -164,25 +164,16 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
                 modifier = Modifier.fillMaxWidth()
             )
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(
-                    onClick = {},
-                    interactionSource = duckInteractionSource,
-                ) {
+                Button(onClick = {}, interactionSource = duckInteractionSource) {
                     Text(text = "Duck")
                 }
-                Button(onClick = {
-                    viewModel.sendEvent(JumpPressEvent)
-                }) {
+                Button(onClick = { viewModel.sendEvent(JumpPressEvent) }) {
                     Text(text = "Jump")
                 }
-                Button(
-                    onClick = {},
-                    interactionSource = fireInteractionSource,
-                ) {
+                Button(onClick = {}, interactionSource = fireInteractionSource) {
                     Text(text = "Fire")
                 }
                 Button(onClick = { viewModel.reloadAmmo() }) {

@@ -12,15 +12,11 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
     
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
+    listOf(iosArm64(), iosSimulatorArm64()).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
@@ -28,26 +24,20 @@ kotlin {
     }
     
     sourceSets {
-        
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.androidx.compose)
+            implementation(libs.androidx.startup.runtime)
         }
         commonMain.dependencies {
-            implementation(libs.kermit)
-            implementation(libs.landscapist.coil3)
+            implementation(libs.kotlin.logging)
 
             api(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.navigator.koin)
             implementation(libs.navigator.screen.model)
 
-            val voyagerVersion = "1.1.0-beta02"
-
-            implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
             implementation(libs.kstatemachine)
             implementation(libs.kstatemachine.coroutines)
 
@@ -89,8 +79,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         compose = true
@@ -98,8 +88,5 @@ android {
     dependencies {
         debugImplementation(compose.uiTooling)
     }
-}
-dependencies {
-    implementation(libs.androidx.startup.runtime)
 }
 
