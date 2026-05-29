@@ -61,8 +61,8 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
     LaunchedEffect(Unit) {
         viewModel.model.effectFlow.collect { effect ->
             val msg = when (effect) {
-                is ModelEffect.StateEntered -> "State Entered: ${effect.state}"
-                is ModelEffect.ControlEventSent -> "Control Event Sent: ${effect.event}"
+                is ModelEffect.StateEntered -> "State Entered: ${effect.state::class.simpleName}"
+                is ModelEffect.ControlEventSent -> "Control Event Sent: ${effect.event::class.simpleName}"
                 ModelEffect.AmmoDecremented -> "Ammo Decremented"
             }
             logMessages.add(0, msg)
@@ -78,51 +78,46 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
         viewModel.sendEvent(if (isFirePressed) FirePressEvent else FireReleaseEvent)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text(
+            text = "Ammo: ${uiState.ammoLeft}",
+            fontSize = 20.sp,
+            modifier = Modifier.align(Alignment.Start)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Image(
+            painter = heroDrawable,
+            contentDescription = null,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .weight(1f)
+                .background(Color.Gray.copy(alpha = 0.1f))
+                .padding(horizontal = 8.dp, vertical = 4.dp),
         ) {
-            Text(
-                text = "Ammo: ${uiState.ammoLeft}",
-                fontSize = 20.sp,
-                modifier = Modifier.align(Alignment.Start)
-            )
-            Image(
-                painter = heroDrawable,
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth()
-            )
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .background(Color.Gray.copy(alpha = 0.1f))
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-            ) {
-                items(logMessages) { msg ->
-                    Text(text = msg, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
-                }
+            items(logMessages) { msg ->
+                Text(text = msg, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(onClick = {}, interactionSource = duckInteractionSource) {
-                    Text(text = "Duck")
-                }
-                Button(onClick = { viewModel.sendEvent(JumpPressEvent) }) {
-                    Text(text = "Jump")
-                }
-                Button(onClick = {}, interactionSource = fireInteractionSource) {
-                    Text(text = "Fire")
-                }
-                Button(onClick = { viewModel.reloadAmmo() }) {
-                    Text(text = "Reload")
-                }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = {}, interactionSource = duckInteractionSource) {
+                Text(text = "Duck")
+            }
+            Button(onClick = { viewModel.sendEvent(JumpPressEvent) }) {
+                Text(text = "Jump")
+            }
+            Button(onClick = {}, interactionSource = fireInteractionSource) {
+                Text(text = "Fire")
+            }
+            Button(onClick = { viewModel.reloadAmmo() }) {
+                Text(text = "Reload")
             }
         }
     }
