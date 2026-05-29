@@ -2,7 +2,6 @@ package org.example.project
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import co.touchlab.kermit.Logger
 import org.example.project.ControlEvent.DuckPressEvent
 import org.example.project.ControlEvent.DuckReleaseEvent
 import org.example.project.ControlEvent.FirePressEvent
@@ -26,7 +25,6 @@ import ru.nsk.kstatemachine.state.onExit
 import ru.nsk.kstatemachine.state.state
 import ru.nsk.kstatemachine.state.transition
 import ru.nsk.kstatemachine.state.transitionOn
-import ru.nsk.kstatemachine.statemachine.StateMachine
 import ru.nsk.kstatemachine.statemachine.buildCreationArguments
 import ru.nsk.kstatemachine.statemachine.createStateMachineBlocking
 import ru.nsk.kstatemachine.statemachine.onStateEntry
@@ -36,9 +34,7 @@ import ru.nsk.kstatemachine.transition.onTriggered
 class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect> {
     override val model = MviModel<ModelData, ModelEffect>(
         screenModelScope, ModelData(
-            INITIAL_AMMO, listOf(
-                Standing
-            )
+            INITIAL_AMMO, listOf(Standing)
         )
     )
 
@@ -48,12 +44,6 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
         ChildMode.PARALLEL,
         creationArguments = buildCreationArguments { doNotThrowOnMultipleTransitionsMatch = true }
     ) {
-        logger = StateMachine.Logger {
-            Logger.i {
-                "${this@StickManGameScreenModel::class.simpleName}: ${it()}"
-            }
-        }
-
         state("Movement") {
 
             val airAttacking = addState(AirAttacking())
@@ -94,7 +84,6 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
         state("Fire") {
             val shooting = addState(Shooting())
 
-
             addInitialState(NotShooting) {
                 transition<FirePressEvent> {
                     guard = { state.ammoLeft > 0u }
@@ -119,17 +108,7 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
             }
         }
 
-
-        onTransitionComplete { activeStates, transitionParams ->
-            Logger.i {
-                buildString {
-                    appendLine("Transition Complete")
-                    appendLine("Event: ${transitionParams.toString()}")
-//                    appendLine("From State: ${transitionParams.transition().name}")
-//                    appendLine("To State: ${transitionParams.stream()}")
-                    appendLine("Active States: ${activeStates().joinToString { it.name.toString() }}")
-                }
-            }
+        onTransitionComplete { activeStates, _ ->
             intent {
                 val filteredStates = (activeStates as? Iterable<*>)?.filterIsInstance<HeroState>()
                 if (filteredStates != null) {
@@ -137,21 +116,12 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
                 }
             }
         }
-        onStateEntry { state, transitionParams ->
-            Logger.i {
-                """
-                Entering State: ${state.name}
-                Previous State: ${transitionParams.transition.name}
-                Event Triggered: ${transitionParams.event}
-                Active States: ${this.activeStates().map { it.name }}
-                """.trimIndent()
-            }
+        onStateEntry { state, _ ->
             intent {
                 if (state is HeroState)
                     sendEffect(ModelEffect.StateEntered(state))
             }
         }
-
     }
 
     fun sendEvent(event: ControlEvent): Unit = intent {

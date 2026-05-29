@@ -31,8 +31,6 @@ kotlin {
             implementation(libs.androidx.startup.runtime)
         }
         commonMain.dependencies {
-            implementation(libs.kotlin.logging)
-
             api(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.navigator.koin)
