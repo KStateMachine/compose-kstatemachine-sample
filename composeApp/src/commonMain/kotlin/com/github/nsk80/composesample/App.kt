@@ -1,4 +1,4 @@
-package org.example.project
+package com.github.nsk80.composesample
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*

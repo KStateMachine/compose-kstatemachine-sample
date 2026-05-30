@@ -1,4 +1,4 @@
-package org.example.project
+package com.github.nsk80.composesample
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import kstatemachine_compose_sample.composeapp.generated.resources.*
-import org.example.project.ControlEvent.*
-import org.example.project.HeroState.*
+import com.github.nsk80.composesample.ControlEvent.*
+import com.github.nsk80.composesample.HeroState.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 

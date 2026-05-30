@@ -1,4 +1,4 @@
-package org.example.project
+package com.github.nsk80.composesample
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
