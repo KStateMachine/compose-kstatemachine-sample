@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -115,16 +116,18 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     uiState.activeStates.forEach { state ->
                         Surface(
+                            modifier = Modifier.width(105.dp),
                             shape = RoundedCornerShape(4.dp),
                             color = MaterialTheme.colors.primary.copy(alpha = 0.10f),
-                            border = BorderStroke(1.dp, MaterialTheme.colors.primary.copy(alpha = 0.30f))
+                            border = BorderStroke(1.dp, MaterialTheme.colors.primary.copy(alpha = 0.30f)),
                         ) {
                             Text(
                                 text = state::class.simpleName ?: "",
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp).fillMaxWidth(),
                                 fontSize = 11.sp,
                                 fontFamily = FontFamily.Monospace,
-                                color = MaterialTheme.colors.primary
+                                color = MaterialTheme.colors.primary,
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
