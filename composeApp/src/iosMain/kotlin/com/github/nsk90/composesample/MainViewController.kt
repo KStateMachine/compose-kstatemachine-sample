@@ -1,4 +1,4 @@
-package com.github.nsk80.composesample
+package com.github.nsk90.composesample
 
 import androidx.compose.ui.window.ComposeUIViewController
 

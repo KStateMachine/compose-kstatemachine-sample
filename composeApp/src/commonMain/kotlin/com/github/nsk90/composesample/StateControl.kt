@@ -1,4 +1,4 @@
-package com.github.nsk80.composesample
+package com.github.nsk90.composesample
 
 import kotlinx.coroutines.Job
 import ru.nsk.kstatemachine.event.Event
