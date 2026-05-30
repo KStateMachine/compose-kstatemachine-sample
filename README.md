@@ -87,8 +87,6 @@ UI (StickManGameScreen)
 | `Timers.kt` | `singleShotTimer` & `tickerFlow` coroutine helpers |
 | `StickManGameScreen.kt` | Compose UI; sprite selection via `List<HeroState>.hasState<T>()` |
 
-Koin initialises automatically via **`androidx.startup`** — no custom `Application` subclass required.
-
 ---
 
 ## 🚀 Build & run
