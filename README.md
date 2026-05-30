@@ -1,6 +1,6 @@
 <div align="center">
 
-# compose-kstatemachine-sample
+# Compose KStateMachine Sample
 
 **A Kotlin Multiplatform sample showing [KStateMachine](https://github.com/kstatemachine/kstatemachine) powering a 2D hero character**  
 **in a Compose UI with a parallel state machine and MVI architecture**
@@ -36,7 +36,7 @@ Control a stick-figure hero through a set of **movement** and **fire** states us
 The hero sprite updates in real time to reflect the current combination of movement + fire state. A live log panel shows every state entry, transition, and control event.
 
 <p align="center">
-  <img src="./images/app-sample.gif" alt="App sample" width="300"/>
+  <img src="./images/app-sample.gif" alt="App sample"/>
 </p>
 
 ---
