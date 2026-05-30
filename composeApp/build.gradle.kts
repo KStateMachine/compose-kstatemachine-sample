@@ -25,7 +25,6 @@ kotlin {
     
     sourceSets {
         androidMain.dependencies {
-            implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.androidx.startup.runtime)
@@ -39,12 +38,12 @@ kotlin {
             implementation(libs.kstatemachine)
             implementation(libs.kstatemachine.coroutines)
 
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.components.resources)
+            implementation(libs.compose.components.ui.tooling.preview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
         }
@@ -84,7 +83,7 @@ android {
         compose = true
     }
     dependencies {
-        debugImplementation(compose.uiTooling)
+        debugImplementation(libs.compose.ui.tooling)
     }
 }
 

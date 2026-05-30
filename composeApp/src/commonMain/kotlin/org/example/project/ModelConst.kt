@@ -1,8 +1,10 @@
 package org.example.project
 
-const val JUMP_DURATION_MS = 1000L
+import kotlin.time.Duration.Companion.milliseconds
+
+val JUMP_DURATION_MS = 1000.milliseconds
 const val INITIAL_AMMO = 40u
-const val SHOOTING_INTERVAL_MS = 50L
+val SHOOTING_INTERVAL_MS = 50.milliseconds
 
 data class ModelData(val ammoLeft: UInt, val activeStates: List<HeroState>)
 

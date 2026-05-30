@@ -16,11 +16,21 @@ voyager = "1.0.1"
 [libraries]
 kstatemachine = { module = "io.github.nsk90:kstatemachine", version.ref = "kstatemachine" }
 kstatemachine-coroutines = { module = "io.github.nsk90:kstatemachine-coroutines", version.ref = "kstatemachine" }
+
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+
 navigator-screen-model = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 navigator-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
-koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-plugin" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-plugin" }
+compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose-plugin" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-plugin" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-plugin" }
+compose-components-ui-tooling-preview = { module = "org.jetbrains.compose.components:components-ui-tooling-preview", version.ref = "compose-plugin" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose-plugin" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
