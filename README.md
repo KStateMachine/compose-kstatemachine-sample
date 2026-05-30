@@ -35,6 +35,10 @@ Control a stick-figure hero through a set of **movement** and **fire** states us
 
 The hero sprite updates in real time to reflect the current combination of movement + fire state. A live log panel shows every state entry, transition, and control event.
 
+<p align="center">
+  <img src="./images/app-sample.gif" alt="App sample" width="300"/>
+</p>
+
 ---
 
 ## 🗺️ State machine
