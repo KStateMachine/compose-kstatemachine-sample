@@ -2,7 +2,8 @@
 
 # Compose KStateMachine Sample
 
-**A Kotlin Multiplatform sample showing [KStateMachine](https://github.com/kstatemachine/kstatemachine) powering a 2D hero character**  
+**A Kotlin Multiplatform sample showing [KStateMachine](https://github.com/kstatemachine/kstatemachine) powering a 2D
+hero character**  
 **in a Compose UI with a parallel state machine and MVI architecture**
 
 ---
@@ -26,14 +27,15 @@
 
 Control a stick-figure hero through a set of **movement** and **fire** states using four on-screen buttons:
 
-| Button | Action |
-|---|---|
-| **Jump** | Hero leaves the ground; auto-lands after 1 s |
-| **Duck** (hold) | Hero crouches while held |
+| Button          | Action                                             |
+|-----------------|----------------------------------------------------|
+| **Jump**        | Hero leaves the ground; auto-lands after 1 s       |
+| **Duck** (hold) | Hero crouches while held                           |
 | **Fire** (hold) | Hero shoots at 50 ms intervals until ammo runs out |
-| **Reload** | Restores ammo to 40 rounds |
+| **Reload**      | Restores ammo to 40 rounds                         |
 
-The hero sprite updates in real time to reflect the current combination of movement + fire state. A live log panel shows every state entry, transition, and control event.
+The hero sprite updates in real time to reflect the current combination of movement + fire state. A live log panel shows
+every state entry, transition, and control event.
 
 <p align="center">
   <img src="./images/app-sample.gif" alt="App sample"/>
@@ -58,9 +60,11 @@ Hero (PARALLEL root)
     └── Shooting     ──FireRelease | OutOfAmmo──► NotShooting
 ```
 
-`activeStates` always contains exactly **two** `HeroState` values — one from each region — which the UI combines to pick the correct sprite.
+`activeStates` always contains exactly **two** `HeroState` values — one from each region — which the UI combines to pick
+the correct sprite.
 
-> `AirAttacking` and `Shooting` are Kotlin `class` (not `object`) because they carry mutable instance state: `isDuckPressed` and `shootingTimer` respectively. All other states are `object` singletons.
+> `AirAttacking` and `Shooting` are Kotlin `class` (not `object`) because they carry mutable instance state:
+`isDuckPressed` and `shootingTimer` respectively. All other states are `object` singletons.
 
 ---
 
@@ -78,14 +82,14 @@ UI (StickManGameScreen)
             → UI redraws
 ```
 
-| Layer | Responsibility |
-|---|---|
-| `StateControl.kt` | Domain types — `ControlEvent` & `HeroState` sealed hierarchies |
-| `StickmanGameScreenModel.kt` | Builds the machine; bridges KStateMachine → MVI |
-| `Mvi.kt` | Generic `MviModel<State, Effect>` (StateFlow + Channel) |
-| `ModelConst.kt` | Game constants and `ModelData` / `ModelEffect` types |
-| `Timers.kt` | `singleShotTimer` & `tickerFlow` coroutine helpers |
-| `StickManGameScreen.kt` | Compose UI; sprite selection via `List<HeroState>.hasState<T>()` |
+| Layer                        | Responsibility                                                   |
+|------------------------------|------------------------------------------------------------------|
+| `StateControl.kt`            | Domain types — `ControlEvent` & `HeroState` sealed hierarchies   |
+| `StickmanGameScreenModel.kt` | Builds the machine; bridges KStateMachine → MVI                  |
+| `Mvi.kt`                     | Generic `MviModel<State, Effect>` (StateFlow + Channel)          |
+| `ModelConst.kt`              | Game constants and `ModelData` / `ModelEffect` types             |
+| `Timers.kt`                  | `singleShotTimer` & `tickerFlow` coroutine helpers               |
+| `StickManGameScreen.kt`      | Compose UI; sprite selection via `List<HeroState>.hasState<T>()` |
 
 ---
 
