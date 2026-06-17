@@ -6,10 +6,10 @@ android-minSdk = "28"
 android-targetSdk = "34"
 androidx-activityCompose = "1.13.0"
 androidx-lifecycle = "2.10.0"
-compose-plugin = "1.11.0"
+compose-plugin = "1.11.1"
 kotlin = "2.3.21"
-kstatemachine = "0.36.0"
-koin = "4.2.1"
+kstatemachine = "0.38.0"
+koin = "4.2.2"
 startupRuntime = "1.2.0"
 voyager = "1.0.1"
 
@@ -29,7 +29,7 @@ compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", v
 compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose-plugin" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-plugin" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-plugin" }
-compose-components-ui-tooling-preview = { module = "org.jetbrains.compose.components:components-ui-tooling-preview", version.ref = "compose-plugin" }
+compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-plugin" }
 compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose-plugin" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }

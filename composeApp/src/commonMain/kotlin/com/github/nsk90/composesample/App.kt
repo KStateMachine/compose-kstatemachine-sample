@@ -6,8 +6,9 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import cafe.adriel.voyager.navigator.Navigator
+import androidx.compose.ui.tooling.preview.Preview
+
 
 private val LightColors = lightColors(
     primary = Color(0xFF0277BD),

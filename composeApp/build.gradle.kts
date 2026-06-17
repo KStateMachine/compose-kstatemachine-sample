@@ -43,7 +43,7 @@ kotlin {
             implementation(libs.compose.material)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
-            implementation(libs.compose.components.ui.tooling.preview)
+            implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
         }
@@ -86,4 +86,3 @@ android {
         debugImplementation(libs.compose.ui.tooling)
     }
 }
-
