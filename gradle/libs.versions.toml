@@ -11,7 +11,7 @@ kotlin = "2.4.10"
 kstatemachine = "0.38.1"
 koin = "4.2.2"
 startupRuntime = "1.2.0"
-voyager = "1.0.1"
+voyager = "2.2.21-1.10.3"
 
 [libraries]
 kstatemachine = { module = "io.github.nsk90:kstatemachine", version.ref = "kstatemachine" }
