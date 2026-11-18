@@ -24,7 +24,13 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      # Release iOS framework linking is slow and adds no coverage for a sample,
-      # so build the Android APK and the debug simulator framework only.
+      # Release iOS framework linking needs more memory than the macOS runner has
+      # (~6 GB Gradle daemon peak) and swaps for 15+ min per framework, so link
+      # debug frameworks only. They verify the same code, minus LLVM optimization.
       - name: Build with Gradle
-        run: ./gradlew :androidApp:assembleDebug :composeApp:linkDebugFrameworkIosSimulatorArm64
+        run: >
+          ./gradlew
+          :androidApp:assembleDebug
+          :androidApp:lintDebug
+          :composeApp:linkDebugFrameworkIosSimulatorArm64
+          :composeApp:linkDebugFrameworkIosArm64
