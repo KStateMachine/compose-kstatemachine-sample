@@ -1,13 +1,10 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
 name: Build and test with Gradle
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -24,10 +21,16 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: build
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
 
-      - name: Codecov
-        uses: codecov/codecov-action@v7
+      # Release iOS framework linking needs more memory than the macOS runner has
+      # (~6 GB Gradle daemon peak) and swaps for 15+ min per framework, so link
+      # debug frameworks only. They verify the same code, minus LLVM optimization.
+      - name: Build with Gradle
+        run: >
+          ./gradlew
+          :androidApp:assembleDebug
+          :androidApp:lintDebug
+          :composeApp:linkDebugFrameworkIosSimulatorArm64
+          :composeApp:linkDebugFrameworkIosArm64
