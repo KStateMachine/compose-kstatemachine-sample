@@ -24,5 +24,7 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
+      # Release iOS framework linking is slow and adds no coverage for a sample,
+      # so build the Android APK and the debug simulator framework only.
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew :androidApp:assembleDebug :composeApp:linkDebugFrameworkIosSimulatorArm64
