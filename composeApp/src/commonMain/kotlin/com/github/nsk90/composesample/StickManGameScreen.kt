@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,8 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.koin.getScreenModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.nsk90.composesample.ControlEvent.*
 import com.github.nsk90.composesample.HeroState.*
 import kstatemachine_compose_sample.composeapp.generated.resources.*
@@ -29,14 +29,6 @@ import org.jetbrains.compose.resources.painterResource
 
 private enum class LogTag { STATE, TRANSITION, EVENT }
 private data class LogEntry(val tag: LogTag, val text: String)
-
-class StickManGameScreen : Screen {
-    @Composable
-    override fun Content() {
-        val viewModel = getScreenModel<StickManGameScreenModel>()
-        StickManGameScreenContent(viewModel)
-    }
-}
 
 private fun heroDrawable(states: List<HeroState>): DrawableResource = when {
     states.hasState<Shooting>() && states.hasState<Standing>()     -> Res.drawable.standing_shooting
@@ -51,8 +43,8 @@ private fun heroDrawable(states: List<HeroState>): DrawableResource = when {
 }
 
 @Composable
-fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
-    val uiState by viewModel.model.stateFlow.collectAsState()
+fun StickManGameScreen(viewModel: StickManGameViewModel = viewModel { StickManGameViewModel() }) {
+    val uiState by viewModel.model.stateFlow.collectAsStateWithLifecycle()
     val logEntries = remember { mutableStateListOf<LogEntry>() }
     val heroDrawableRes = remember(uiState.activeStates) { heroDrawable(uiState.activeStates) }
 
@@ -88,6 +80,7 @@ fun StickManGameScreenContent(viewModel: StickManGameScreenModel) {
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
+                .safeDrawingPadding()
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             if (maxWidth > maxHeight) {
@@ -166,13 +159,13 @@ private fun AmmoHeader(uiState: ModelData) {
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.5.sp,
-                color = MaterialTheme.colors.onSurface.copy(alpha = 0.45f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f)
             )
             Text(
                 text = "${uiState.ammoLeft}",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.primary
+                color = MaterialTheme.colorScheme.primary
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -180,15 +173,15 @@ private fun AmmoHeader(uiState: ModelData) {
                 Surface(
                     modifier = Modifier.width(105.dp),
                     shape = RoundedCornerShape(4.dp),
-                    color = MaterialTheme.colors.primary.copy(alpha = 0.10f),
-                    border = BorderStroke(1.dp, MaterialTheme.colors.primary.copy(alpha = 0.30f))
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.30f))
                 ) {
                     Text(
                         text = state::class.simpleName ?: "",
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp).fillMaxWidth(),
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
-                        color = MaterialTheme.colors.primary,
+                        color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -201,14 +194,16 @@ private fun AmmoHeader(uiState: ModelData) {
 private fun AmmoBar(uiState: ModelData) {
     val ammoFraction = uiState.ammoLeft.toFloat() / INITIAL_AMMO.toFloat()
     LinearProgressIndicator(
-        progress = ammoFraction,
+        progress = { ammoFraction },
         modifier = Modifier.fillMaxWidth().height(3.dp),
         color = when {
             ammoFraction > 0.5f -> Color(0xFF4CAF50)
             ammoFraction > 0.2f -> Color(0xFFFF9800)
             else                -> Color(0xFFF44336)
         },
-        backgroundColor = MaterialTheme.colors.onSurface.copy(alpha = 0.10f)
+        trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f),
+        gapSize = 0.dp,
+        drawStopIndicator = {},
     )
 }
 
@@ -217,8 +212,8 @@ private fun EventLog(entries: List<LogEntry>, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.04f),
-        border = BorderStroke(1.dp, MaterialTheme.colors.onSurface.copy(alpha = 0.08f))
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.04f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
     ) {
         LazyColumn(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -244,7 +239,7 @@ private fun EventLog(entries: List<LogEntry>, modifier: Modifier = Modifier) {
 private fun ControlButtonRow(
     duckInteractionSource: MutableInteractionSource,
     fireInteractionSource: MutableInteractionSource,
-    viewModel: StickManGameScreenModel
+    viewModel: StickManGameViewModel
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -260,8 +255,8 @@ private fun ControlButtonRow(
             onClick = { viewModel.sendEvent(JumpPressEvent) },
             modifier = Modifier.weight(1f),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondary,
-                contentColor = MaterialTheme.colors.onSecondary
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
             )
         ) { Text("Jump", fontSize = 13.sp) }
 
@@ -270,7 +265,7 @@ private fun ControlButtonRow(
             interactionSource = fireInteractionSource,
             modifier = Modifier.weight(1f),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(0xFFB71C1C),
+                containerColor = Color(0xFFB71C1C),
                 contentColor = Color.White
             )
         ) { Text("Fire", fontSize = 13.sp) }

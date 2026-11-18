@@ -70,12 +70,12 @@ the correct sprite.
 
 ## 🏗️ Architecture
 
-**MVI + KStateMachine + Voyager + Koin**
+**MVI + KStateMachine + Lifecycle ViewModel**
 
 ```
 UI (StickManGameScreen)
   → sendEvent(ControlEvent)
-    → StickManGameScreenModel.machine.processEvent()   [KStateMachine]
+    → StickManGameViewModel.machine.processEvent()   [KStateMachine]
       → onTransitionComplete / onStateEntry callbacks
         → intent { state { … } / sendEffect(…) }
           → MviModel.stateFlow / effectFlow
@@ -85,7 +85,7 @@ UI (StickManGameScreen)
 | Layer                        | Responsibility                                                   |
 |------------------------------|------------------------------------------------------------------|
 | `StateControl.kt`            | Domain types — `ControlEvent` & `HeroState` sealed hierarchies   |
-| `StickmanGameScreenModel.kt` | Builds the machine; bridges KStateMachine → MVI                  |
+| `StickManGameViewModel.kt`   | Builds the machine; bridges KStateMachine → MVI                  |
 | `Mvi.kt`                     | Generic `MviModel<State, Effect>` (StateFlow + Channel)          |
 | `ModelConst.kt`              | Game constants and `ModelData` / `ModelEffect` types             |
 | `Timers.kt`                  | `singleShotTimer` & `tickerFlow` coroutine helpers               |
@@ -98,7 +98,7 @@ UI (StickManGameScreen)
 **Android**
 
 ```bash
-./gradlew :composeApp:assembleDebug
+./gradlew :androidApp:assembleDebug
 # then install the APK or run directly from Android Studio
 ```
 

@@ -1,7 +1,7 @@
 package com.github.nsk90.composesample
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.nsk90.composesample.ControlEvent.DuckPressEvent
 import com.github.nsk90.composesample.ControlEvent.DuckReleaseEvent
 import com.github.nsk90.composesample.ControlEvent.FirePressEvent
@@ -32,15 +32,15 @@ import ru.nsk.kstatemachine.statemachine.onTransitionComplete
 import ru.nsk.kstatemachine.statemachine.onTransitionTriggered
 import ru.nsk.kstatemachine.transition.onTriggered
 
-class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect> {
+class StickManGameViewModel : ViewModel(), MviModelHost<ModelData, ModelEffect> {
     override val model = MviModel<ModelData, ModelEffect>(
-        screenModelScope, ModelData(
+        viewModelScope, ModelData(
             INITIAL_AMMO, listOf(Standing)
         )
     )
 
     private val machine = createStateMachineBlocking(
-        screenModelScope,
+        viewModelScope,
         "Hero",
         ChildMode.PARALLEL,
         creationArguments = buildCreationArguments { doNotThrowOnMultipleTransitionsMatch = true }
@@ -55,7 +55,7 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
 
             addState(Jumping) {
                 onEntry {
-                    screenModelScope.singleShotTimer(JUMP_DURATION_MS) {
+                    viewModelScope.singleShotTimer(JUMP_DURATION_MS) {
                         sendEvent(JumpCompleteEvent)
                     }
                 }
@@ -96,7 +96,7 @@ class StickManGameScreenModel : ScreenModel, MviModelHost<ModelData, ModelEffect
                 transition<OutOfAmmoEvent>(targetState = NotShooting)
 
                 onEntry {
-                    shootingTimer = screenModelScope.launch {
+                    shootingTimer = viewModelScope.launch {
                         tickerFlow(SHOOTING_INTERVAL_MS).collect {
                             if (state.ammoLeft == 0u)
                                 sendEvent(OutOfAmmoEvent)
