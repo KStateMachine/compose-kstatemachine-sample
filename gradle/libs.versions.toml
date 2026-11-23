@@ -9,7 +9,7 @@ androidx-lifecycle = "2.11.0"
 compose-plugin = "1.12.2"
 compose-material3 = "1.9.0"
 kotlin = "2.4.21"
-kstatemachine = "0.38.1"
+kstatemachine = "0.39.1"
 
 [libraries]
 kstatemachine = { module = "io.github.nsk90:kstatemachine", version.ref = "kstatemachine" }
